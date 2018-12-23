@@ -20,6 +20,10 @@ define( function( require ) {
     projectName: 'wave-on-a-string',
     viewSize: new Dimension2( 768, 504 ),
 
+    // Papa constants
+    tekenSchaalY: 20,
+    hoekVerdraaingSchaal: 0.1,
+
     // prefer 200 hue
     blueUpColor: new Color( 'hsl(210,70%,75%)' ),
     blueOverColor: new Color( 'hsl(210,90%,80%)' ),

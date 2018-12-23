@@ -15,6 +15,7 @@ define( function( require ) {
   var EndNode = require( 'WAVE_ON_A_STRING/wave-on-a-string/view/action/EndNode' );
   var Image = require( 'SCENERY/nodes/Image' );
   var inherit = require( 'PHET_CORE/inherit' );
+  var Rectangle = require( 'SCENERY/nodes/Rectangle' );
   var Line = require( 'SCENERY/nodes/Line' );
   var Node = require( 'SCENERY/nodes/Node' );
   var PhetFont = require( 'SCENERY_PHET/PhetFont' );
@@ -196,14 +197,23 @@ define( function( require ) {
     } ) );
 
     var windowImage;
+
     //center line
-    this.addChild( new Line( 0, 0, 605, 0, {
+    /*this.addChild( new Line( 0, 0, 605, 0, {
       stroke: '#FFA91D',
       lineDash: [ 8, 5 ],
       lineWidth: 2,
       x: Constants.startTheStringNode,
       y: Constants.yTheStringNode
-    } ) );
+    } ) );*/
+
+    this.addChild( new Rectangle( 0, -Constants.tekenSchaalY, 605, 2 * Constants.tekenSchaalY, {
+      fill: 'gray',
+      x: Constants.startTheStringNode,
+      y: Constants.yTheStringNode
+    } ) )
+
+
     var endNode = new EndNode( model, this.frameEmitter, { x: Constants.endTheStringNode, y: Constants.yTheStringNode } );
     endNode.windowNode.x += Constants.endTheStringNode;
     endNode.windowNode.y += Constants.yTheStringNode;

@@ -8,6 +8,7 @@
 
 define( function( require ) {
   'use strict';
+  var Rectangle = require( 'SCENERY/nodes/Rectangle' );
   var Circle = require( 'SCENERY/nodes/Circle' );
   var Image = require( 'SCENERY/nodes/Image' );
   var inherit = require( 'PHET_CORE/inherit' );
@@ -15,6 +16,7 @@ define( function( require ) {
   var Path = require( 'SCENERY/nodes/Path' );
   var Shape = require( 'KITE/Shape' );
   var waveOnAString = require( 'WAVE_ON_A_STRING/waveOnAString' );
+  var Constants = require( 'WAVE_ON_A_STRING/wave-on-a-string/Constants' );
 
   /**
    * @constructor
@@ -37,7 +39,7 @@ define( function( require ) {
 
     var highlightCircle = new Circle( options.radius * 0.3, { fill: '#fff', x: -0.45 * options.radius, y: -0.45 * options.radius } );
     var scale = 3;
-    var redBead = new Circle( options.radius, { fill: 'red', stroke: 'black', lineWidth: 0.5, children: [ highlightCircle ], scale: scale } );
+    var redBead = new Rectangle( -5, -2, 10, 4, { fill: 'black', scale: scale } );
     var limeBead = new Circle( options.radius, { fill: 'lime', stroke: 'black', lineWidth: 0.5, children: [ highlightCircle ], scale: scale } );
 
     var redNode;
@@ -51,8 +53,8 @@ define( function( require ) {
     } );
 
     for ( var i = 0; i < model.yDraw.length; i++ ) {
-      var bead = ( i % 10 === 0 ) ? limeNode : redNode;
-      theString.push( new Node( { x: i * options.radius * 2, children: [ bead ] } ) );
+      // var bead = ( i % 10 === 0 ) ? limeNode : redNode;
+      theString.push( new Node( { x: i * options.radius * 2, children: [ redNode ] } ) );
     }
     theString[ 0 ].scale( 1.2 );
     this.addChild( new Node( { children: theString } ) );
@@ -60,18 +62,23 @@ define( function( require ) {
     this.mutate( options );
 
     function updateTheString() {
-      theStringShape = new Shape();
+      theStringShape = new Shape(); // ???
       theString[ 0 ].y = model.nextLeftY;
-      theStringShape.lineTo( 0, model.nextLeftY || 0 );
+      theStringShape.lineTo( 0, model.nextLeftY || 0 ); // ??
       for ( var i = 1; i < model.yDraw.length; i++ ) {
-        theString[ i ].y = model.yDraw[ i ];
-        /*REVIEW:
-         * A lot of the performance issues relate to this shape drawing. There's nothing you can do here,
-         * I'll hopefully have speed improvements to Kite's Shape soon to make this much faster. Sorry!
-         */
-        theStringShape.lineTo( i * options.radius * 2, model.yDraw[ i ] || 0 );
+        var y = model.yDraw[ i ] * Constants.hoekVerdraaingSchaal;
+        var py = Math.sin(y);
+        var px = Math.cos(y);
+
+        if (px < 0) {
+          theString[ i ].y = -1000;
+        } else {
+          theString[ i ].y = py * Constants.tekenSchaalY;
+        }
+
+        //theString[ i ].y = model.yDraw[ i ];
       }
-      theStringPath.shape = theStringShape;
+      theStringPath.shape = theStringShape; // ???
     }
 
     var dirty = true;
