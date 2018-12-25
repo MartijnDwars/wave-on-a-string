@@ -26,59 +26,56 @@ define( function( require ) {
    */
   function TheStringNode( model, frameEmitter, options ) {
     Node.call( this, { layerSplit: true } );
+
+    var lijnen = [];
+    var paden = [];
+    for (var i = 0; i < Constants.papaLijnKleuren.length; i++) {
+      var lijnShape = new Shape();
+      var lijnPath = new Path(lijnShape, {stroke: Constants.papaLijnKleuren[i]});
+      this.addChild(lijnPath);
+      lijnen.push(lijnShape);
+      paden.push(lijnPath);
+    }
+
     var theStringShape = new Shape();
-    var theStringPath = new Path( theStringShape, {
-      stroke: '#F00'
-    } );
-    var theString = [];
-    this.addChild( theStringPath );
+    var theStringPath = new Path(theStringShape, {stroke: '#000'});
+    this.addChild(theStringPath);
 
     theStringPath.computeShapeBounds = function() {
       return this.getShape().bounds.dilated( 20 ); // miterLimit should cut off with the normal stroke before this
     };
 
-    var highlightCircle = new Circle( options.radius * 0.3, { fill: '#fff', x: -0.45 * options.radius, y: -0.45 * options.radius } );
-    var scale = 3;
-    var redBead = new Rectangle( -5, -2, 10, 4, { fill: 'black', scale: scale } );
-    var limeBead = new Circle( options.radius, { fill: 'lime', stroke: 'black', lineWidth: 0.5, children: [ highlightCircle ], scale: scale } );
-
-    var redNode;
-    redBead.toDataURL( function( url, x, y ) {
-      redNode = new Image( url, { x: -x / scale, y: -y / scale, scale: 1 / scale } );
-    } );
-
-    var limeNode;
-    limeBead.toDataURL( function( url, x, y ) {
-      limeNode = new Image( url, { x: -x / scale, y: -y / scale, scale: 1 / scale } );
-    } );
-
-    for ( var i = 0; i < model.yDraw.length; i++ ) {
-      // var bead = ( i % 10 === 0 ) ? limeNode : redNode;
-      theString.push( new Node( { x: i * options.radius * 2, children: [ redNode ] } ) );
-    }
-    theString[ 0 ].scale( 1.2 );
-    this.addChild( new Node( { children: theString } ) );
-
     this.mutate( options );
 
-    function updateTheString() {
-      theStringShape = new Shape(); // ???
-      theString[ 0 ].y = model.nextLeftY;
-      theStringShape.lineTo( 0, model.nextLeftY || 0 ); // ??
-      for ( var i = 1; i < model.yDraw.length; i++ ) {
-        var y = model.yDraw[ i ] * Constants.hoekVerdraaingSchaal;
+    function drawPapaLine(i) {
+      theStringShape = new Shape();
+      theStringShape.lineTo(0, model.nextLeftY || 0);
+
+      lijnen[i] = new Shape();
+
+      for (var j = 0; j < model.yDraw.length; j++) {
+        var y = model.yDraw[ j ] * Constants.hoekVerdraaingSchaal;
+        y += i * 2 * Math.PI / Constants.papaLijnKleuren.length;
         var py = Math.sin(y);
         var px = Math.cos(y);
 
-        if (px < 0) {
-          theString[ i ].y = -1000;
-        } else {
-          theString[ i ].y = py * Constants.tekenSchaalY;
-        }
+        theStringShape.lineTo( j * options.radius * 2, model.yDraw[ j ] || 0 );
 
-        //theString[ i ].y = model.yDraw[ i ];
+        if (px < 0) {
+          lijnen[i].moveTo(j * options.radius * 2, py * Constants.tekenSchaalY);
+        } else {
+          lijnen[i].lineTo(j * options.radius * 2, py * Constants.tekenSchaalY);
+        }
       }
-      theStringPath.shape = theStringShape; // ???
+
+      theStringPath.shape = theStringShape;
+      paden[i].shape = lijnen[i];
+    }
+
+    function updateTheString() {
+      for (var i = 0; i < Constants.papaLijnKleuren.length; i++) {
+        drawPapaLine(i);
+      }
     }
 
     var dirty = true;

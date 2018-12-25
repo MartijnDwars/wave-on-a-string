@@ -23,6 +23,7 @@ define( function( require ) {
     // Papa constants
     tekenSchaalY: 20,
     hoekVerdraaingSchaal: 0.1,
+    papaLijnKleuren: ['#ff0000', '#00ff00', '#ffff00', '#0000ff', '#ff00ff', '#ffff00', '#ffffff'],
 
     // prefer 200 hue
     blueUpColor: new Color( 'hsl(210,70%,75%)' ),
