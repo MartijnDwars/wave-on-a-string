@@ -139,12 +139,18 @@ define( function( require ) {
       model.nextLeftY = Math.max( Math.min( point.y, options.range.max ), options.range.min );
       model.playProperty.set( true );
       model.yNowChanged.emit();
+
+      console.log("Drag");
     }, function endCallback( event, trail ) {
       if ( event.target !== wrenchTopArrow && event.target !== wrenchBottomArrow ) {
         model.wrenchArrowsVisibleProperty.set( false );
       }
+
+      console.log("Onclick");
     }, function endCallback( event, trail ) {
       model.wrenchArrowsVisibleProperty.set( false );
+
+      console.log("Offclick");
     } ) );
     model.wrenchArrowsVisibleProperty.link( function( value ) {
       wrenchTopArrow.visible = value;

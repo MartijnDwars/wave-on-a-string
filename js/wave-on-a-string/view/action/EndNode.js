@@ -13,6 +13,7 @@ define( function( require ) {
   var inherit = require( 'PHET_CORE/inherit' );
   var Node = require( 'SCENERY/nodes/Node' );
   var Rectangle = require( 'SCENERY/nodes/Rectangle' );
+  var Shape = require( 'KITE/Shape' );
   var waveOnAString = require( 'WAVE_ON_A_STRING/waveOnAString' );
 
   // images
@@ -30,8 +31,9 @@ define( function( require ) {
   function EndNode( model, frameEmitter, options ) {
     Node.call( this );
     var clamp = new Image( clampImage, { x: -17, y: -31, scale: 0.4 } );
-    var ring_back = new Node( { children: [ new Image( ringBackImage, { x: 5, y: -14 / 2, scale: 0.5 } ) ] } );
-    var ring_front = new Node( { children: [ new Image( ringFrontImage, { x: 4.7, y: 0, scale: 0.5 } ) ] } );
+    var ringBack = new Node( { children: [ new Image( ringBackImage, { x: 5, y: -14 / 2, scale: 0.5 } ) ] } );
+    let ringFrontImageNode = new Image( ringFrontImage, { x: 4.7, y: 0, scale: 0.5 } );
+    var ringFront = new Node( { children: [ ringFrontImageNode ], cursor: 'pointer' } );
     var windowNode = new Image( windowImage, { right: Constants.windowXOffset + Constants.windowShift, centerY: 0, scale: Constants.windowScale } );
     var post = new Rectangle( -5, -130, 10, 260, {
       stroke: '#000',
@@ -39,16 +41,29 @@ define( function( require ) {
       x: 20
     } );
 
+    ringFront.touchArea = Shape.bounds(ringFrontImageNode.bounds.dilated(Constants.dilatedTouchArea));
+    ringFront.mouseArea = Shape.bounds(ringFrontImageNode.bounds);
+
     this.addChild( clamp );
-    this.addChild( ring_back );
+    this.addChild( ringBack );
     this.addChild( post );
-    this.addChild( ring_front );
+    this.addChild( ringFront );
     this.windowNode = windowNode;
+
+    ringFront.addInputListener(Constants.dragAndDropHandler(ringFront, function (point) {
+      console.log("Ring drag to ", point);
+      ringBack.y = point.y;
+      ringFront.y = point.y;
+    }, function endCallback(event, trail) {
+      console.log("Ring drop.");
+    }, function endCallback(event, trail) {
+      console.log("Ring dropped?");
+    }));
 
     this.mutate( options );
 
     function updateRing() {
-      ring_front.y = ring_back.y = model.yNow[ model.yNow.length - 1 ] || 0;
+      // ringFront.y = ringBack.y = model.yNow[ model.yNow.length - 1 ] || 0;
     }
 
     var dirty = true;
@@ -62,9 +77,9 @@ define( function( require ) {
 
     model.typeEndProperty.link( function updateVisible( value ) {
       clamp.setVisible( value === 'fixedEnd' );
-      ring_back.setVisible( value === 'looseEnd' );
+      ringBack.setVisible( value === 'looseEnd' );
       post.setVisible( value === 'looseEnd' );
-      ring_front.setVisible( value === 'looseEnd' );
+      ringFront.setVisible( value === 'looseEnd' );
       windowNode.setVisible( value === 'noEnd' );
 
       if ( value === 'fixedEnd' ) {
